@@ -14,8 +14,8 @@ These are our CLI args:
 | `--maze` | `perfect` | String | Specifies a maze gen algorithm |
 | `--ai` | `astar` | String | Specifies agent algorithm |
 | `--trials` | `1` | Int | Number of trials to perform |
-| `--width` | `20` | Int | Width of maze |
-| `--height` | `20` | Int | Height of maze |
+| `--width` | `21` | Int | Width of maze, Must be odd |
+| `--height` | `21` | Int | Height of maze, Must be odd |
 
 
 The `maze` arg defines which maze generator we will use. If this is missing, we will default to `perfect`. These are the valid options:
