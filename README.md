@@ -7,7 +7,16 @@ This is our group project for CS5100, Fall 2020 Semester.
 To run the project, just use:
 `python main.py`
 
-We have three CLI args, `maze`, `ai`, and `trials`.
+These are our CLI args:
+
+| Arg | Default | Type | Description |
+|---|---|---|---|
+| `--maze` | `perfect` | String | Specifies a maze gen algorithm |
+| `--ai` | `astar` | String | Specifies agent algorithm |
+| `--trials` | `1` | Int | Number of trials to perform |
+| `--width` | `20` | Int | Width of maze |
+| `--height` | `20` | Int | Height of maze |
+
 
 The `maze` arg defines which maze generator we will use. If this is missing, we will default to `perfect`. These are the valid options:
 - `perfect`
@@ -31,7 +40,7 @@ This will run the A* agent through 5 perfect mazes and provide us a report of th
 To test maze generation, use:
 `python mazegen.py`
 
-There is only one CLI arg: `maze`. This is from the same list as above. This will
+This takes the `maze`, `width`, and `height` CLI arg from the above table.
 
 ### Example Usage
 `python mazegen.py --braid`
