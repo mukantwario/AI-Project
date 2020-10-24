@@ -44,4 +44,4 @@ This takes the `maze`, `width`, and `height` CLI arg from the above table.
 
 ### Example Usage
 `python mazegen.py --braid`
-This will print a braid maze to the console output.
+This will print a 20x20 braid maze to the console output.
