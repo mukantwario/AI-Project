@@ -246,6 +246,10 @@ def get_maze(maze_type, width, height):
   elif maze_type == RECURSIVE_DIVISION:
     return recursive_division_maze(width, height)
 
+    
+  print('Invalid maze type')
+  sys.exit(1)
+
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   parser.add_argument('--maze', default='perfect')

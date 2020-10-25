@@ -33,33 +33,21 @@ class Directions:
                
 
 class Agent:
-  """
-  An agent must define a getAction method, but may also define the
-  following methods which will be called if they exist:
-
-  def registerInitialState(self, state): # inspects the starting state
-  """
-  def __init__(self, index=0):
-    self.index = index
-
-  def getAction(self, state):
-    """
-    The Agent will receive a GameState (from either {pacman, capture, sonar}.py) and
-    must return an action from Directions.{North, South, East, West, Stop}
-    """
-    print('not defined')    
+  def getPlan(self, problem):
+    print('not defined') 
     sys.exit(1)
 
 class Problem:
-    def __init__(self, startState):
+    def __init__(self, startState, goalState):
         self.start = startState.start
         self.maze = startState.maze
+        self.goal = goalState
 
     def getStartState(self):
         return self.start
 
     def isGoalState(self, state):
-        return state[1].count() == 0
+        return state == self.goal
 
     def getSuccessors(self, state):
         "Returns successor states, the actions they require, and a cost of 1."

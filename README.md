@@ -22,7 +22,8 @@ The `maze` arg defines which maze generator we will use. If this is missing, we 
 - `perfect`
 - `braid`
 - `recursive_division`
-  
+- `all`*
+    
 The `ai` arg defines which ai agent we will use. If this is missing, we will default to `all` These are the valid options:
 - `dfs`
 - `bfs`
