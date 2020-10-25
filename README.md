@@ -21,6 +21,7 @@ These are our CLI args:
 The `maze` arg defines which maze generator we will use. If this is missing, we will default to `perfect`. These are the valid options:
 - `perfect`
 - `braid`
+- `recursive_division`
   
 The `ai` arg defines which ai agent we will use. If this is missing, we will default to `all` These are the valid options:
 - `dfs`

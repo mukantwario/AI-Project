@@ -7,6 +7,7 @@ from util import Directions
 MAZE_CHARS = ['  ','██','▒▒','░░']
 PERFECT_MAZE = 'perfect'
 BRAID_MAZE = 'braid'
+RECURSIVE_DIVISION = 'recursive_division'
 
 def zeroes(width, height):
   maze = []
@@ -43,26 +44,29 @@ def has_dead_ends(maze, width, height):
           return True
   return False
 
-def add_access(maze, width, height, start):
+def fill(maze, width, height, start, replace):
   queue = []
   visited = set()
+  x_init, y_init = start
+  old_color = maze[y_init][x_init]
 
   queue.append(start)
   while len(queue) > 0:
     x, y = queue.pop()
-    maze[y][x] = 2
+    maze[y][x] = replace
     visited.add((x, y))
     for direction in Directions.LIST:
       dx, dy = Directions.TO_VECTOR[direction]
       x2, y2 = int(x + dx), int(y + dy)
-      if (x2, y2) not in visited and maze[y2][x2] == 0:
-        queue.append((x2, y2))
+      if x2 >= 0 and x2 < width and y2 >= 0 and y2 < height:
+        if (x2, y2) not in visited and maze[y2][x2] == old_color:
+          queue.append((x2, y2))
 
-def remove_access(maze, width, height):
+def replace_all(maze, width, height, replace, new_color):
   for x in range(width):
     for y in range(height):
-      if maze[y][x] == 2:
-        maze[y][x] = 0
+      if maze[y][x] == replace:
+        maze[y][x] = new_color
 
 def maze_contains(maze, width, height, item):
   for x in range(width):
@@ -95,7 +99,7 @@ def braid_maze(width, height):
     if has_dead_ends(maze, width, height):
       maze[y][x] = 0
 
-  add_access(maze, width, height, (1, 1))
+  fill(maze, width, height, (1, 1), 2)
   # take down walls that can't be accessed
   while maze_contains(maze, width, height, 0):    
     removed_wall = False
@@ -109,15 +113,77 @@ def braid_maze(width, height):
             maze[y][x] = 0
             removed_wall = True
             
-    remove_access(maze, width, height)
-    add_access(maze, width, height, (1, 1))
+    replace_all(maze, width, height, 2, 0)
+    fill(maze, width, height, (1, 1), 2)
 
-  remove_access(maze, width, height)
+  replace_all(maze, width, height, 2, 0)
   return maze
 
 def perfect_maze(width, height):
   maze = zeroes(width, height)
   border(maze, width, height)
+  pillars(maze, width, height)
+  fill(maze, width, height, (0,0), 2)
+  queue = []
+  
+  for x in range(width):
+    for y in range(height):
+      if maze[y][x] == 0:
+        queue.append((x, y))
+
+  random.shuffle(queue)
+
+  while len(queue) > 0:    
+    x, y = queue.pop(0)
+
+    if maze[y][x+1] == 2 and maze[y][x-1] == 1:
+      maze[y][x] = 2
+      maze[y][x+1] = 2
+      maze[y][x-1] = 2
+    elif maze[y+1][x] == 2 and maze[y-1][x] == 1:
+      maze[y][x] = 2
+      maze[y+1][x] = 2
+      maze[y-1][x] = 2
+    elif maze[y+1][x] == 1 and maze[y-1][x] == 1:
+      queue.append((x,y))
+    elif maze[y][x+1] == 1 and maze[y][x-1] == 1:
+      queue.append((x,y))
+    
+  replace_all(maze, width, height, 2, 1)
+  return maze
+
+def divide_vertical(maze, width, height, start, end):
+  x1, y1 = start
+  x2, y2 = end
+
+def divide_horizontal(maze, width, height, start, end):
+  x1, y1 = start
+  x2, y2 = end
+
+def divide(maze, width, height, start, end):
+  x1, y1 = start
+  x2, y2 = end
+
+  if abs(x1-x2) == 2 and abs(y2-y1) == 2:
+    return
+  elif abs(x1-x2) == 2:
+    # must divide horizontally
+    divide_horizontal(maze, width, height, start, end)
+  elif abs(y1-y2) == 2:
+    # must divide vertically
+    divide_vertical(maze, width, height, start, end)
+  else:
+    # can divide either way
+    if random.random() >= 0.5:
+      divide_horizontal(maze, width, height, start, end)
+    else:
+      divide_vertical(maze, width, height, start, end)
+
+def recursive_division_maze(width, height):
+  maze = zeroes(width, height)
+  border(maze, width, height)
+
+  divide(maze, width, height, (0,0), (width-1, height-1))
 
   return maze
 
@@ -138,6 +204,8 @@ def get_maze(maze_type, width, height):
     return perfect_maze(width, height)
   elif maze_type == BRAID_MAZE:
     return braid_maze(width, height)
+  elif maze_type == RECURSIVE_DIVISION:
+    return recursive_division_maze(width, height)
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
