@@ -156,9 +156,48 @@ def divide_vertical(maze, width, height, start, end):
   x1, y1 = start
   x2, y2 = end
 
+  options = []
+  for x in range(x1+1,x2):
+    if x % 2 == 0:
+      options.append(x)
+
+  random.shuffle(options)
+  x = options.pop()
+
+  options = []
+  for y in range(y1+1, y2):
+    if y % 2 == 1:
+      options.append(y)
+    maze[y][x] = 1
+    
+  random.shuffle(options)
+  maze[options.pop()][x] = 0
+  divide(maze, width, height, start, (x,y2))
+  divide(maze, width, height, (x,y1), end)
+
 def divide_horizontal(maze, width, height, start, end):
   x1, y1 = start
   x2, y2 = end
+
+  options = []
+  for y in range(y1+1,y2):
+    if y % 2 == 0:
+      options.append(y)
+
+  random.shuffle(options)
+  y = options.pop()
+
+  options = []
+  for x in range(x1+1, x2):
+    if x % 2 == 1:
+      options.append(x)
+    maze[y][x] = 1
+    
+  random.shuffle(options)
+  maze[y][options.pop()] = 0
+
+  divide(maze, width, height, start, (x2,y))
+  divide(maze, width, height, (x1,y), end)
 
 def divide(maze, width, height, start, end):
   x1, y1 = start
