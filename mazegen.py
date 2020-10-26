@@ -2,81 +2,15 @@ import argparse
 import random
 import sys
 from util import Directions
+from mazeutil import zeroes, border, pillars, has_dead_ends, fill, maze_contains, replace_all, MAZE_CHARS, PERFECT_MAZE, BRAID_MAZE, RECURSIVE_DIVISION
 
-
-MAZE_CHARS = ['  ','██','▒▒','░░']
-PERFECT_MAZE = 'perfect'
-BRAID_MAZE = 'braid'
-RECURSIVE_DIVISION = 'recursive_division'
-
-def zeroes(width, height):
-  maze = []
-  for i in range(height):
-    row = []
-    for j in range(width):
-      row.append(0)
-    maze.append(row)
-  return maze
-
-def border(maze, width, height):
-  for i in range(height):
-    for j in range(width):
-      if i == 0 or i == height - 1 or j == 0 or j == width - 1:
-        maze[i][j] = 1
-
-def pillars(maze, width, height):
-  for x in range(width):
-    for y in range(height):
-      if x % 2 == 0 and y % 2 == 0:
-        maze[y][x] = 1
-
-def has_dead_ends(maze, width, height):
-  for x in range(width):
-    for y in range(height):
-      if not (y == 0 or y == height - 1 or x == 0 or x == width - 1):
-        sum = 0
-        sum += maze[y+1][x]
-        sum += maze[y][x+1]
-        sum += maze[y-1][x]
-        sum += maze[y][x-1]
-
-        if sum > 2:
-          return True
-  return False
-
-def fill(maze, width, height, start, replace):
-  queue = []
-  visited = set()
-  x_init, y_init = start
-  old_color = maze[y_init][x_init]
-
-  queue.append(start)
-  while len(queue) > 0:
-    x, y = queue.pop()
-    maze[y][x] = replace
-    visited.add((x, y))
-    for direction in Directions.LIST:
-      dx, dy = Directions.TO_VECTOR[direction]
-      x2, y2 = int(x + dx), int(y + dy)
-      if x2 >= 0 and x2 < width and y2 >= 0 and y2 < height:
-        if (x2, y2) not in visited and maze[y2][x2] == old_color:
-          queue.append((x2, y2))
-
-def replace_all(maze, width, height, replace, new_color):
-  for x in range(width):
-    for y in range(height):
-      if maze[y][x] == replace:
-        maze[y][x] = new_color
-
-def maze_contains(maze, width, height, item):
-  for x in range(width):
-    for y in range(height):
-      if maze[y][x] == item:
-        return (x, y)
-
-  return False
-
-
+# Braid maze is a maze with no dead ends
+# this implementation shuffles all wall positions into a list, then goes through the list and attempts to build a wall there
+# if building a wall results in a dead end being created, undo that wall and move on
+# repeat until queue is empty
+# this strategy can result in inaccessible 'pockets', so afterwards we iterate through and paint all paths we can visit from (1,1)
+# if there are no unvisited paths, we're good, otherwise, we look for a wall we can break down between a visited path and an univisted path
+# repeat until there are no unvisited paths
 def braid_maze(width, height):
   maze = zeroes(width, height)
   border(maze, width, height)
@@ -119,6 +53,8 @@ def braid_maze(width, height):
   replace_all(maze, width, height, 2, 0)
   return maze
 
+# A perfect maze is defined by the property: if any two outside walls are removed, there is exactly one path connecting those two points
+# This algorithm randomly builds walls from the borders of the maze, and only builds a wall that won't connect with another branch
 def perfect_maze(width, height):
   maze = zeroes(width, height)
   border(maze, width, height)
@@ -218,6 +154,10 @@ def divide(maze, width, height, start, end):
     else:
       divide_vertical(maze, width, height, start, end)
 
+# this algorithm creates a perfect maze as well
+# it works be recursively taking a region, slicing it horizontall or vertically, and leaving one space open to pass through
+# then take the resulting two regions from the split, and repeat the same operation
+# this algorithm results in very few 'diagonal' paths, and creates a somewhat 'blocky' maze
 def recursive_division_maze(width, height):
   maze = zeroes(width, height)
   border(maze, width, height)
