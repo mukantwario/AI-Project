@@ -6,6 +6,8 @@ DFS = 'dfs'
 BFS = 'bfs'
 ASTAR = 'astar'
 
+ALL_AGENTS = [DFS, BFS, ASTAR]
+
 class DfsAgent(Agent):
   def getPlan(self, problem):
     # TODO: implement DFS w/ this problem
@@ -14,31 +16,29 @@ class DfsAgent(Agent):
 
 class BfsAgent(Agent):
   def getPlan(self, problem):
-    # the shape of our queue items is: {position, action, weight, path,}
 
     start = problem.getStartState()
     
     visited = {start[0]}
     q = []
 
-    def push(item, parent):
+    def push(item):
         if item[0] not in visited:
-            item = item + (parent[3] + [item[1]],)
             visited.add(item[0])
             q.append(item)
 
 
     for state in problem.getSuccessors(start): 
-        push(state, (0,0,0,[]))
+        push(state)
 
     while len(q) > 0:
         state = q.pop(0)
 
-        if problem.isGoalState(state[0]):
-            return state[3]
+        if problem.isGoalState(state):
+            return state[1]
 
-        for child in problem.getSuccessors(state[0]):
-            push(child, state)
+        for child in problem.getSuccessors(state):
+            push(child)
 
     return []
 
@@ -55,16 +55,16 @@ def nullHeuristic(state, problem=None):
 
 class AstarAgent(Agent):
   def getPlan(self, problem, heuristic=nullHeuristic):
-    # the shape of our queue items is: {position, action, weight, path, pathCost}
+    # the shape of our queue items is: {position, weight, path, pathCost}
 
     start = problem.getStartState()
     
     # visited is a dict with the key being the position, and the value being cost to potentially get there
-    visited = {start[0]:0}
+    visited = {start:0}
     q = PriorityQueue()
 
     def push(item, parent):
-        if item[0] not in visited or visited[item[0]] > parent[4]+item[2]:
+        if item not in visited or visited[item] > parent[4]+item[2]:
             item = item + (parent[3] + [item[1]],parent[4]+item[2])
             h = heuristic(item[0],problem)+item[4]
             visited[item[0]] = parent[4] + item[2]
@@ -80,7 +80,7 @@ class AstarAgent(Agent):
         if problem.isGoalState(state[0]):
             return state[3]
 
-        for child in problem.getSuccessors(state[0]):
+        for child in problem.getSuccessors(state):
             push(child, state)
 
     return []

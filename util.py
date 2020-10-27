@@ -25,8 +25,8 @@ class Directions:
   }
 
   TO_VECTOR = {
-    NORTH: (0, 1),
-    SOUTH: (0, -1),
+    NORTH: (0, -1),
+    SOUTH: (0, 1),
     EAST: (1, 0),
     WEST: (-1, 0),
   }
@@ -38,40 +38,27 @@ class Agent:
     sys.exit(1)
 
 class Problem:
-    def __init__(self, startState, goalState):
-        self.start = startState.start
-        self.maze = startState.maze
+    def __init__(self, startState, goalState, maze, width, height):
+        self.start = startState
+        self.maze = maze
+        self.width = width
+        self.height = height
         self.goal = goalState
+        
 
     def getStartState(self):
-        return self.start
+        return (self.start, [], 0)
 
     def isGoalState(self, state):
-        return state == self.goal
+        return state[0] == self.goal
 
     def getSuccessors(self, state):
-        "Returns successor states, the actions they require, and a cost of 1."
+        "Returns successor states, the actions they require, and the cumulative cost."
         successors = []
         for direction in Directions.LIST:
             x,y = state[0]
             dx, dy = Directions.TO_VECTOR[direction]
             nextx, nexty = int(x + dx), int(y + dy)
-            if not self.maze[nextx][nexty]:
-                nextFood = state[1].copy()
-                nextFood[nextx][nexty] = False
-                successors.append( ( ((nextx, nexty), nextFood), direction, 1) )
+            if nextx >= 0 and nextx < self.width and nexty >= 0 and nexty < self.height and self.maze[nexty][nextx] == 0:
+                successors.append(((nextx, nexty), state[1]  + [direction], state[2] + 1))
         return successors
-
-    def getCostOfActions(self, actions):
-        """Returns the cost of a particular sequence of actions.  If those actions
-        include an illegal move, return 999999"""
-        x,y= self.getStartState()[0]
-        cost = 0
-        for direction in Directions.LIST:
-            # figure out the next state and see whether it's legal
-            dx, dy = Directions.TO_VECTOR[direction]
-            x, y = int(x + dx), int(y + dy)
-            if self.maze[x][y]:
-                return 999999
-            cost += 1
-        return cost

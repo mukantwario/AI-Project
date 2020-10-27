@@ -4,6 +4,8 @@ import sys
 from util import Directions
 from mazeutil import zeroes, border, pillars, has_dead_ends, fill, maze_contains, replace_all, MAZE_CHARS, PERFECT_MAZE, BRAID_MAZE, RECURSIVE_DIVISION
 
+ALL_MAZES = [PERFECT_MAZE, BRAID_MAZE, RECURSIVE_DIVISION]
+
 # Braid maze is a maze with no dead ends
 # this implementation shuffles all wall positions into a list, then goes through the list and attempts to build a wall there
 # if building a wall results in a dead end being created, undo that wall and move on
