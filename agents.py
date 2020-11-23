@@ -1,5 +1,6 @@
 from util import Agent
 from queue import PriorityQueue
+from collections import deque
 import sys
 
 DFS = 'dfs'
@@ -10,9 +11,23 @@ ALL_AGENTS = [DFS, BFS, ASTAR]
 
 class DfsAgent(Agent):
   def getPlan(self, problem):
-    # TODO: implement DFS w/ this problem
-    print('not defined') 
-    sys.exit(1)
+      # TODO: implement DFS w/ this problem
+      start = problem.getStartState()
+      stack = deque()
+      stack.push(start)
+      visited = {start[0]}
+      while stack.size() >0:
+          state= stack.pop()
+          if state in visited:
+              continue
+          if problem.isGoalState(state):
+             return state[1]
+          for child in problem.getSuccessors(state):
+              stack.push(child)
+          visited.add(state)
+      return []
+    #print('not defined')
+    #sys.exit(1)
 
 class BfsAgent(Agent):
   def getPlan(self, problem):
