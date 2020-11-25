@@ -105,8 +105,8 @@ def get_agent(agent_type):
     return DfsAgent()
   elif agent_type == BFS:
     return BfsAgent()
-  '''elif agent_type == ASTAR:
-    return AstarAgent()'''
+  elif agent_type == ASTAR:
+    return AstarAgent()
     
   print('Invalid agent type.')
   sys.exit(1)
