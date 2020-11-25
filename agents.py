@@ -13,18 +13,18 @@ class DfsAgent(Agent):
   def getPlan(self, problem):
       # TODO: implement DFS w/ this problem
       start = problem.getStartState()
-      stack = deque()
-      stack.push(start)
+      stack = deque([start])
       visited = {start[0]}
-      while stack.size() >0:
-          state= stack.pop()
-          if state in visited:
+      while len(stack) > 0:
+          state = stack.pop()
+          if state[0] in visited:
               continue
           if problem.isGoalState(state):
              return state[1]
-          for child in problem.getSuccessors(state):
-              stack.push(child)
           visited.add(state)
+          for child in problem.getSuccessors(state):
+              if child not in visited:
+                  stack.append(child)
       return []
     #print('not defined')
     #sys.exit(1)
@@ -75,7 +75,7 @@ class AstarAgent(Agent):
     start = problem.getStartState()
     
     # visited is a dict with the key being the position, and the value being cost to potentially get there
-    visited = {start:0}
+    visited = {start[0]:0}
     q = PriorityQueue()
 
     def push(item, parent):
@@ -105,8 +105,8 @@ def get_agent(agent_type):
     return DfsAgent()
   elif agent_type == BFS:
     return BfsAgent()
-  elif agent_type == ASTAR:
-    return AstarAgent()
+  '''elif agent_type == ASTAR:
+    return AstarAgent()'''
     
   print('Invalid agent type.')
   sys.exit(1)
