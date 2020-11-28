@@ -1,6 +1,6 @@
 from util import Agent
 from queue import PriorityQueue
-from collections import deque
+import util
 import sys
 
 DFS = 'dfs'
@@ -13,18 +13,19 @@ class DfsAgent(Agent):
   def getPlan(self, problem):
       # TODO: implement DFS w/ this problem
       start = problem.getStartState()
-      stack = deque([start])
-      visited = {start[0]}
-      while len(stack) > 0:
+      stack = util.Stack()
+      stack.push(start)
+      visited = set()
+      while not stack.isEmpty():
           state = stack.pop()
-          if state[0] in visited:
-              continue
+          visited.add(state[0])
           if problem.isGoalState(state):
              return state[1]
-          visited.add(state)
-          for child in problem.getSuccessors(state):
-              if child not in visited:
-                  stack.append(child)
+          successors = problem.getSuccessors(state)
+          for item in successors:
+              if item[0] in visited:
+                  continue
+              stack.push(item)
       return []
     #print('not defined')
     #sys.exit(1)
@@ -75,28 +76,18 @@ class AstarAgent(Agent):
     start = problem.getStartState()
     
     # visited is a dict with the key being the position, and the value being cost to potentially get there
-    visited = {start[0]:0}
-    q = PriorityQueue()
-
-    def push(item, parent):
-        if item not in visited or visited[item] > parent[4]+item[2]:
-            item = item + (parent[3] + [item[1]],parent[4]+item[2])
-            h = heuristic(item[0],problem)+item[4]
-            visited[item[0]] = parent[4] + item[2]
-            q.put(PriorityItem(h, item))
-
-
-    for state in problem.getSuccessors(start): 
-        push(state, (0,0,0,[], 0))
-
-    while not q.empty():
-        state = q.get().item
-
+    visited = set()
+    q = util.PriorityQueue()
+    q.push(start, 0)
+    while not q.isEmpty():
+        state = q.pop()
         if problem.isGoalState(state[0]):
-            return state[3]
-
-        for child in problem.getSuccessors(state):
-            push(child, state)
+            return state[1]
+        if state[0] not in visited:
+            visited.add(state[0])
+            for child in problem.getSuccessors(state):
+                if child[0] not in visited:
+                    q.push(child, state[2] + child[2])
 
     return []
 
