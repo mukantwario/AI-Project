@@ -87,7 +87,7 @@ class AstarAgent(Agent):
             visited.add(state[0])
             for child in problem.getSuccessors(state):
                 if child[0] not in visited:
-                    q.push(child, state[2] + child[2])
+                    q.push(child, state)
 
     return []
 
