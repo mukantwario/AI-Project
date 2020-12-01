@@ -1,6 +1,9 @@
 import sys
 import heapq
 
+import copy
+
+
 class Directions:
   NORTH = 'North'
   SOUTH = 'South'
@@ -31,7 +34,6 @@ class Directions:
     EAST: (1, 0),
     WEST: (-1, 0),
   }
-               
 
 class Agent:
   def getPlan(self, problem):
@@ -64,6 +66,33 @@ class Problem:
                 successors.append(((nextx, nexty), state[1]  + [direction], state[2] + 1))
         return successors
 
+        # Generates legal moves available for the agent to move from a state
+
+    def legalMoves(problem, row, column):
+        moves = []
+        if column - 1 >= 0:
+            moves.append('West')
+        if row + 1 < len(problem.maze):
+            moves.append('South')
+        if row - 1 >= 0:
+            moves.append('North')
+        if column + 1 < len(problem.maze[0]):
+            moves.append('East')
+
+        return moves
+
+class Policy:
+    def __init__(self, problem):  # problem is a Problem
+        # Signal 'no policy' by just displaying the maze there
+        self.best_actions = copy.deepcopy(problem.maze)
+
+    # TODO: create method: returns list reference like Astar using
+    #  the best_actions storing them as a list and returning them
+    def __str__(self):
+        return '\n'.join([' '.join(
+            [str(element) for element in row]
+        ) for row in self.best_actions])
+
 class Stack:
     "A container with a last-in-first-out (LIFO) queuing policy."
     def __init__(self):
@@ -81,12 +110,12 @@ class Stack:
         "Returns true if the stack is empty"
         return len(self.list) == 0
 
+
+
 class PriorityQueue:
     """
       Implements a priority queue data structure. Each inserted item
-      has a priority associated with it and the client is usually interested
-      in quick retrieval of the lowest-priority item in the queue. This
-      data structure allows O(1) access to the lowest-priority item.
+      has a priority associated with quick retrieval of the lowest-priority item in the queue.
     """
     def  __init__(self):
         self.heap = []
