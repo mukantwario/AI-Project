@@ -1,5 +1,3 @@
-import heapq
-
 from util import Agent
 from queue import PriorityQueue
 import util
@@ -11,126 +9,108 @@ BFS = 'bfs'
 ASTAR = 'astar'
 MDP = 'mdp'
 
-ALL_AGENTS = [DFS, BFS, ASTAR]
+ALL_AGENTS = [DFS, BFS, ASTAR, MDP]
 ITERATIONS = 10000
 WALL_REWARD = -150.0
 GOAL_REWARD = 100.0
 DISCOUNT_FACTOR = 0.5
 
+
 class DfsAgent(Agent):
-  def getPlan(self, problem):
-      # TODO: implement DFS w/ this problem
-      start = problem.getStartState()
-      stack = util.Stack()
-      stack.push(start)
-      visited = set()
-      while not stack.isEmpty():
-          state = stack.pop()
-          visited.add(state[0])
-          if problem.isGoalState(state):
-             return state
-          successors = problem.getSuccessors(state)
-          for item in successors:
-              if item[0] in visited:
-                  continue
-              stack.push(item)
-      return []
-    #print('not defined')
-    #sys.exit(1)
+    def getPlan(self, problem):
+        # TODO: implement DFS w/ this problem
+        start = problem.getStartState()
+        stack = util.Stack()
+        stack.push(start)
+        visited = set()
+        while not stack.isEmpty():
+            state = stack.pop()
+            visited.add(state[0])
+            if problem.isGoalState(state):
+                return state[1]
+            successors = problem.getSuccessors(state)
+            for item in successors:
+                if item[0] in visited:
+                    continue
+                stack.push(item)
+        return []
+    # print('not defined')
+    # sys.exit(1)
+
 
 class BfsAgent(Agent):
-  def getPlan(self, problem):
+    def getPlan(self, problem):
 
-    start = problem.getStartState()
-    
-    visited = {start[0]}
-    q = []
+        start = problem.getStartState()
 
-    def push(item):
-        if item[0] not in visited:
-            visited.add(item[0])
-            q.append(item)
+        visited = {start[0]}
+        q = []
 
+        def push(item):
+            if item[0] not in visited:
+                visited.add(item[0])
+                q.append(item)
 
-    for state in problem.getSuccessors(start): 
-        push(state)
+        for state in problem.getSuccessors(start):
+            push(state)
 
-    while len(q) > 0:
-        state = q.pop(0)
+        while len(q) > 0:
+            state = q.pop(0)
 
-        if problem.isGoalState(state):
-            return state[1]
+            if problem.isGoalState(state):
+                return state[1]
 
-        for child in problem.getSuccessors(state):
-            push(child)
+            for child in problem.getSuccessors(state):
+                push(child)
 
-    return []
+        return []
+
 
 class PriorityItem:
     def __init__(self, priority, item):
         self.priority = priority
         self.item = item
-    
+
     def __lt__(self, other):
         return self.priority < other.priority
+
 
 def nullHeuristic(state, problem=None):
     return 0
 
+
 class AstarAgent(Agent):
-  def getPlan(self, problem, heuristic=nullHeuristic):
-    # the shape of our queue items is: {position, weight, path, pathCost}
+    def getPlan(self, problem, heuristic=nullHeuristic):
+        # the shape of our queue items is: {position, weight, path, pathCost}
 
-    start = problem.getStartState()
-    
-    # visited is a dict with the key being the position, and the value being cost to potentially get there
-    visited = set()
-    q = util.PriorityQueue()
-    q.push(start, 0)
-    while not q.isEmpty():
-        state = q.pop()
-        if problem.isGoalState(state[0]):
-            return state[1]
-        if state[0] not in visited:
-            visited.add(state[0])
-            for child in problem.getSuccessors(state):
-                if child[0] not in visited:
-                    cost = state[2] + child[2]
-                    total = cost + heuristic(child[0],problem)
-                    q.push((child[0], state[1] + [child[1]], cost), total)
+        start = problem.getStartState()
 
-    return []
+        # visited is a dict with the key being the position, and the value being cost to potentially get there
+        visited = set()
+        q = util.PriorityQueue()
+        q.push(start, 0)
+        while not q.isEmpty():
+            state = q.pop()
+            if problem.isGoalState(state):
+                return state[1]
+            if state[0] not in visited:
+                visited.add(state[0])
+                for child in problem.getSuccessors(state):
+                    if child[0] not in visited:
+                        q.push(child, state[2] + child[2])
+
+        return []
 
 
-'''class AstarAgent(Agent):
-  def getPlan(self, problem, heuristic=nullHeuristic):
-    # the shape of our queue items is: {position, action, weight, path, pathCost}
+class Policy:
+    def __init__(self, problem):  # problem is a Problem
+        # Signal 'no policy' by just displaying the maze there
+        self.best_actions = copy.deepcopy(problem.maze)
 
-    start = problem.getStartState()
-
-
-    # visited is a dict with the key being the position, and the value being cost to potentially get there
-    visited = {start: 0}
-    q = PriorityQueue()
-
-
-    def push(item, parent):
-        if item not in visited or visited[item] > parent[4]+item[2]:
-            item = item + (parent[3] + [item[1]],parent[4]+item[2])
-            h = heuristic(item[0],problem)+item[4]
-            visited[item[0]] = parent[4] + item[2]
-            q.put(PriorityItem(h,item))
-
-        for state in problem.getSuccessors(start):
-            push(state,(0,0,0,[],0))
-        while not q.empty():
-            state = q.get().item
-
-            if problem.isGoalState(state[0]):
-                return state[3]
-            for child in problem.getSuccessors(state):
-                push(child, state)
-        return []'''
+    def __str__(self):
+        return '\n'.join([' '.join(
+            [str(element) for element in row]
+        ) for row in self.best_actions])
 
 
 # Generates the maximum utility value of a state from all the possible
@@ -219,7 +199,7 @@ class MdpAgent(Agent):
             iterations -= 1
 
         # Generate the Policy based on above computation
-        policy = util.Policy(problem)
+        policy = Policy(problem)
 
         # reset the maze to original value
         problem.maze = grid
@@ -227,12 +207,14 @@ class MdpAgent(Agent):
 
 
 def get_agent(agent_type):
-  if agent_type == DFS:
-    return DfsAgent()
-  elif agent_type == BFS:
-    return BfsAgent()
-  elif agent_type == ASTAR:
-    return AstarAgent()
-    
-  print('Invalid agent type.')
-  sys.exit(1)
+    if agent_type == DFS:
+        return DfsAgent()
+    elif agent_type == BFS:
+        return BfsAgent()
+    elif agent_type == ASTAR:
+        return AstarAgent()
+    elif agent_type == MDP:
+        return MdpAgent()
+
+    print('Invalid agent type.')
+    sys.exit(1)

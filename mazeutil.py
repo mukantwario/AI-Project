@@ -5,6 +5,7 @@ MAZE_CHARS = ['  ','██','▒▒','░░']
 PERFECT_MAZE = 'perfect'
 BRAID_MAZE = 'braid'
 RECURSIVE_DIVISION = 'recursive_division'
+RECURSIVE_QUADRANTS = 'recursive_quadrants'
 
 
 def zeroes(width, height):
