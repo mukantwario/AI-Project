@@ -47,6 +47,7 @@ class Problem:
         self.width = width
         self.height = height
         self.goal = goalState
+        self.nodes_explored = 0
 
         if transition_probs is None:
             self.move_probs = [.25] * 4
@@ -60,6 +61,7 @@ class Problem:
         return state[0] == self.goal
 
     def getSuccessors(self, state):
+        self.nodes_explored += 1
         "Returns successor states, the actions they require, and the cumulative cost."
         successors = []
         for direction in Directions.LIST:
@@ -69,6 +71,7 @@ class Problem:
             if nextx >= 0 and nextx < self.width and nexty >= 0 and nexty < self.height and self.maze[nexty][
                 nextx] == 0:
                 successors.append(((nextx, nexty), state[1] + [direction], state[2] + 1))
+
         return successors
 
     # Generates legal moves available for the agent to move from a state

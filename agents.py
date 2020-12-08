@@ -112,6 +112,9 @@ class Policy:
             [str(element) for element in row]
         ) for row in self.best_actions])
 
+    def __len__(self):
+        return 0
+
 
 # Generates the maximum utility value of a state from all the possible
 # utility values allowed based on possible legal moves
