@@ -1,44 +1,42 @@
 import sys
 import heapq
 
-
 class Directions:
-    NORTH = 'North'
-    SOUTH = 'South'
-    EAST = 'East'
-    WEST = 'West'
+  NORTH = 'North'
+  SOUTH = 'South'
+  EAST = 'East'
+  WEST = 'West'
 
-    LIST = [NORTH, SOUTH, EAST, WEST]
+  LIST = [NORTH, SOUTH, EAST, WEST]
 
-    LEFT = {
-        NORTH: WEST,
-        SOUTH: EAST,
-        EAST: NORTH,
-        WEST: SOUTH
-    }
+  LEFT = {
+    NORTH: WEST,
+    SOUTH: EAST,
+    EAST:  NORTH,
+    WEST:  SOUTH
+  }
 
-    RIGHT = dict([(y, x) for x, y in LEFT.items()])
+  RIGHT = dict([(y,x) for x, y in LEFT.items()])
 
-    REVERSE = {
-        NORTH: SOUTH,
-        SOUTH: NORTH,
-        EAST: WEST,
-        WEST: EAST
-    }
+  REVERSE = {
+    NORTH: SOUTH,
+    SOUTH: NORTH,
+    EAST: WEST,
+    WEST: EAST
+  }
 
-    TO_VECTOR = {
-        NORTH: (0, -1),
-        SOUTH: (0, 1),
-        EAST: (1, 0),
-        WEST: (-1, 0),
-    }
-
+  TO_VECTOR = {
+    NORTH: (0, -1),
+    SOUTH: (0, 1),
+    EAST: (1, 0),
+    WEST: (-1, 0),
+  }
+               
 
 class Agent:
-    def getPlan(self, problem):
-        print('not defined')
-        sys.exit(1)
-
+  def getPlan(self, problem):
+    print('not defined') 
+    sys.exit(1)
 
 class Problem:
     def __init__(self, startState, goalState, maze, width, height, transition_probs=None):
@@ -48,12 +46,12 @@ class Problem:
         self.height = height
         self.goal = goalState
         self.nodes_explored = 0
-
+        
         if transition_probs is None:
-            self.move_probs = [.25] * 4
+          self.move_probs = [.25]*4
         else:
-            self.move_probs = transition_probs
-
+          self.move_probs = transition_probs
+        
     def getStartState(self):
         return (self.start, [], 0)
 
@@ -62,40 +60,36 @@ class Problem:
 
     def getSuccessors(self, state):
         self.nodes_explored += 1
-        "Returns successor states, the actions they require, and the cumulative cost."
+        
         successors = []
         for direction in Directions.LIST:
-            x, y = state[0]
+            x,y = state[0]
             dx, dy = Directions.TO_VECTOR[direction]
             nextx, nexty = int(x + dx), int(y + dy)
-            if nextx >= 0 and nextx < self.width and nexty >= 0 and nexty < self.height and self.maze[nexty][
-                nextx] == 0:
-                successors.append(((nextx, nexty), state[1] + [direction], state[2] + 1))
+            if nextx >= 0 and nextx < self.width and nexty >= 0 and nexty < self.height and self.maze[nexty][nextx] == 0:
+                successors.append(((nextx, nexty), state[1]  + [direction], state[2] + 1))
 
         return successors
-
-    # Generates legal moves available for the agent to move from a state
-    def legalMoves(problem, row, column):
+      
+      # Generates legal moves available for the agent to move from a state
+    def legalMoves(self, row, column, grid):
+        self.nodes_explored += 1
         moves = []
-        if column - 1 >= 0:
-            moves.append('West')
-        if row + 1 < len(problem.maze):
-            moves.append('South')
-        if row - 1 >= 0:
-            moves.append('North')
-        if column + 1 < len(problem.maze[0]):
-            moves.append('East')
+
+        for direction in Directions.LIST:
+            dx, dy = Directions.TO_VECTOR[direction]
+            nextx, nexty = int(column + dx), int(row + dy)
+            if nextx >= 0 and nextx < self.width and nexty >= 0 and nexty < self.height and grid[nexty][nextx] == 0:
+                moves.append(direction)
 
         return moves
 
-
 class Stack:
     "A container with a last-in-first-out (LIFO) queuing policy."
-
     def __init__(self):
         self.list = []
 
-    def push(self, item):
+    def push(self,item):
         "Push 'item' onto the stack"
         self.list.append(item)
 
@@ -107,7 +101,6 @@ class Stack:
         "Returns true if the stack is empty"
         return len(self.list) == 0
 
-
 class PriorityQueue:
     """
       Implements a priority queue data structure. Each inserted item
@@ -115,8 +108,7 @@ class PriorityQueue:
       in quick retrieval of the lowest-priority item in the queue. This
       data structure allows O(1) access to the lowest-priority item.
     """
-
-    def __init__(self):
+    def  __init__(self):
         self.heap = []
         self.count = 0
 
@@ -146,3 +138,15 @@ class PriorityQueue:
                 break
         else:
             self.push(item, priority)
+© 2020 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
