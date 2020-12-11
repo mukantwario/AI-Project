@@ -18,7 +18,7 @@ def mean(list):
     return trunc(sum / len(list))
 
 
-def run(mazeType, ai, trials, width, height):
+def run(mazeType, ai, trials, width, height, showplan):
     # setup some data structure for reporting results
     results = []
 
@@ -45,6 +45,8 @@ def run(mazeType, ai, trials, width, height):
         # for each maze
         for mazeTuple in mazes:
             maze = mazeTuple[0]
+            if showplan:
+                print_maze(maze, width, height)
             mazeName = mazeTuple[1]
 
             result[mazeName] = {}
@@ -68,6 +70,9 @@ def run(mazeType, ai, trials, width, height):
                 result[mazeName][agentName]['time'] = time.time() - time_zero
                 result[mazeName][agentName]['length'] = len(plan)
                 result[mazeName][agentName]['nodes'] = problem.nodes_explored
+
+                if showplan:
+                    print(plan)
 
         results.append(result)
 
@@ -120,8 +125,6 @@ def run(mazeType, ai, trials, width, height):
                 nodes_table[mazeName][agentName].append(result[mazeName][agentName]['nodes'])
 
     maze_list = [mazeName for mazeName in by_maze]
-    ai_list = [agentName for agentName in by_ai]
-    heuristic_list = ['time', 'length', 'nodes']
 
     print('\nMean Results by Maze:\n')
     print("\t\t\tTime\tLength\tNodes")
@@ -161,6 +164,7 @@ if __name__ == '__main__':
     parser.add_argument('--trials', type=int, default=1)
     parser.add_argument('--width', type=int, default=21)
     parser.add_argument('--height', type=int, default=21)
+    parser.add_argument('--showplan', type=bool, default=False)
     args = parser.parse_args()
 
-    run(args.maze, args.ai, args.trials, args.width, args.height)
+    run(args.maze, args.ai, args.trials, args.width, args.height, args.showplan)
